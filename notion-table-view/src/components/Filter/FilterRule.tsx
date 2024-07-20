@@ -1,5 +1,6 @@
 // src/components/Filter/FilterRule.tsx
 import React from 'react';
+import './FilterRule.css';
 
 interface FilterRuleProps {
   id: string;

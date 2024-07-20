@@ -1,6 +1,7 @@
 // src/components/Table/Table.tsx
 import React from 'react';
 import TableRow from './TableRow';
+import './Table.css';
 
 interface TableProps {
   data: any[];

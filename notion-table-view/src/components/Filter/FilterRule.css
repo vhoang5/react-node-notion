@@ -1,0 +1,26 @@
+/* src/components/Filter/FilterRule.css */
+
+.filter-rule {
+    display: flex;
+    align-items: center;
+    margin-bottom: 8px;
+  }
+  
+  .filter-rule select,
+  .filter-rule input {
+    margin-right: 8px;
+    padding: 4px;
+  }
+  
+  .filter-rule button {
+    background-color: #f44336;
+    color: white;
+    border: none;
+    padding: 4px 8px;
+    cursor: pointer;
+  }
+  
+  .filter-rule button:hover {
+    background-color: #d32f2f;
+  }
+  
