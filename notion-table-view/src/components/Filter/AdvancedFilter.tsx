@@ -1,11 +1,19 @@
 // src/components/Filter/AdvancedFilter.tsx
 import React, { useState } from 'react';
+import CheckboxFilter from './CheckboxFilter';
+import DateFilter from './DateFilter';
+import MultiSelectFilter from './MultiSelectFilter';
+import NumberFilter from './NumberFilter';
+import RichTextFilter from './RichTextFilter';
+import SelectFilter from './SelectFilter';
+import TimestampFilter from './TimestampFilter';
+import StatusFilter from './StatusFilter';
 import styles from './AdvancedFilter.module.css';
 
 interface FilterRule {
   property: string;
   operator: string;
-  value: string;
+  value: any;
 }
 
 interface FilterGroup {
@@ -36,6 +44,29 @@ const AdvancedFilter: React.FC<AdvancedFilterProps> = ({ onApply }) => {
     onApply(filterGroups);
   };
 
+  const renderFilterInput = (property: string, value: any, onChange: (val: any) => void) => {
+    switch (property) {
+      case 'checkbox':
+        return <CheckboxFilter value={value} onChange={onChange} />;
+      case 'date':
+        return <DateFilter value={value} onChange={onChange} />;
+      case 'multi_select':
+        return <MultiSelectFilter value={value} onChange={onChange} options={['Option 1', 'Option 2']} />;
+      case 'number':
+        return <NumberFilter value={value} onChange={onChange} />;
+      case 'rich_text':
+        return <RichTextFilter value={value} onChange={onChange} />;
+      case 'select':
+        return <SelectFilter value={value} onChange={onChange} options={['Option 1', 'Option 2']} />;
+      case 'timestamp':
+        return <TimestampFilter value={value} onChange={onChange} />;
+      case 'status':
+        return <StatusFilter value={value} onChange={onChange} options={['Active', 'Inactive']} />;
+      default:
+        return <input type="text" value={value} onChange={(e) => onChange(e.target.value)} />;
+    }
+  };
+
   return (
     <div className={styles.container}>
       {filterGroups.map((group, groupIndex) => (
@@ -62,7 +93,13 @@ const AdvancedFilter: React.FC<AdvancedFilterProps> = ({ onApply }) => {
                 }}
               >
                 <option value="">Select Property</option>
-                <option value="name">Name</option>
+                <option value="checkbox">Checkbox</option>
+                <option value="date">Date</option>
+                <option value="multi_select">Multi Select</option>
+                <option value="number">Number</option>
+                <option value="rich_text">Rich Text</option>
+                <option value="select">Select</option>
+                <option value="timestamp">Timestamp</option>
                 <option value="status">Status</option>
               </select>
               <select
@@ -77,15 +114,15 @@ const AdvancedFilter: React.FC<AdvancedFilterProps> = ({ onApply }) => {
                 <option value="contains">Contains</option>
                 <option value="equals">Equals</option>
               </select>
-              <input
-                type="text"
-                value={rule.value}
-                onChange={(e) => {
+              {renderFilterInput(
+                rule.property,
+                rule.value,
+                (val) => {
                   const newGroups = [...filterGroups];
-                  newGroups[groupIndex].rules[ruleIndex].value = e.target.value;
+                  newGroups[groupIndex].rules[ruleIndex].value = val;
                   setFilterGroups(newGroups);
-                }}
-              />
+                }
+              )}
             </div>
           ))}
           <button
