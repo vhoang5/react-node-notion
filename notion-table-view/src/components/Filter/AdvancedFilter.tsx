@@ -31,7 +31,7 @@ const AdvancedFilter: React.FC<AdvancedFilterProps> = ({ columns, onApply }) => 
   };
 
   const renderFilterInput = (column: string, value: any, onChange: (val: any) => void) => {
-    const columnType = columns.find((col) => col.Header === column)?.type;
+    const columnType = columns.find((col) => col.accessor === column)?.type;
 
     switch (columnType) {
       case 'checkbox':
@@ -82,7 +82,7 @@ const AdvancedFilter: React.FC<AdvancedFilterProps> = ({ columns, onApply }) => 
               >
                 <option value="">Select Column</option>
                 {columns.map((column) => (
-                  <option key={column.Header} value={column.Header}>
+                  <option key={column.accessor} value={column.accessor}>
                     {column.Header}
                   </option>
                 ))}
