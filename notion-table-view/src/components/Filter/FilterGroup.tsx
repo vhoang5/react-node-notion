@@ -1,6 +1,7 @@
 // src/components/Filter/FilterGroup.tsx
 import React, { useState } from 'react';
 import FilterRule from './FilterRule';
+import './FilterGroup.css';
 import { v4 as uuidv4 } from 'uuid';
 
 interface FilterGroupProps {
