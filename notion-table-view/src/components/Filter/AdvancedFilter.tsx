@@ -9,43 +9,31 @@ import SelectFilter from './SelectFilter';
 import TimestampFilter from './TimestampFilter';
 import StatusFilter from './StatusFilter';
 import styles from './AdvancedFilter.module.css';
+import { AdvancedFilterProps, FilterGroup } from '../../interface/types';
 
-interface FilterRule {
-  property: string;
-  operator: string;
-  value: any;
-}
-
-interface FilterGroup {
-  condition: string;
-  rules: FilterRule[];
-}
-
-interface AdvancedFilterProps {
-  onApply: (filters: any) => void;
-}
-
-const AdvancedFilter: React.FC<AdvancedFilterProps> = ({ onApply }) => {
+const AdvancedFilter: React.FC<AdvancedFilterProps> = ({ columns, onApply }) => {
   const [filterGroups, setFilterGroups] = useState<FilterGroup[]>([
-    { condition: 'AND', rules: [{ property: '', operator: '', value: '' }] }
+    { condition: 'AND', rules: [{ column: '', operator: '', value: '' }] }
   ]);
 
   const handleAddRule = (groupIndex: number) => {
     const newGroups = [...filterGroups];
-    newGroups[groupIndex].rules.push({ property: '', operator: '', value: '' });
+    newGroups[groupIndex].rules.push({ column: '', operator: '', value: '' });
     setFilterGroups(newGroups);
   };
 
   const handleAddGroup = () => {
-    setFilterGroups([...filterGroups, { condition: 'AND', rules: [{ property: '', operator: '', value: '' }] }]);
+    setFilterGroups([...filterGroups, { condition: 'AND', rules: [{ column: '', operator: '', value: '' }] }]);
   };
 
   const handleApply = () => {
     onApply(filterGroups);
   };
 
-  const renderFilterInput = (property: string, value: any, onChange: (val: any) => void) => {
-    switch (property) {
+  const renderFilterInput = (column: string, value: any, onChange: (val: any) => void) => {
+    const columnType = columns.find((col) => col.Header === column)?.type;
+
+    switch (columnType) {
       case 'checkbox':
         return <CheckboxFilter value={value} onChange={onChange} />;
       case 'date':
@@ -85,22 +73,19 @@ const AdvancedFilter: React.FC<AdvancedFilterProps> = ({ onApply }) => {
           {group.rules.map((rule, ruleIndex) => (
             <div key={ruleIndex} className={styles.filterRule}>
               <select
-                value={rule.property}
+                value={rule.column}
                 onChange={(e) => {
                   const newGroups = [...filterGroups];
-                  newGroups[groupIndex].rules[ruleIndex].property = e.target.value;
+                  newGroups[groupIndex].rules[ruleIndex].column = e.target.value;
                   setFilterGroups(newGroups);
                 }}
               >
-                <option value="">Select Property</option>
-                <option value="checkbox">Checkbox</option>
-                <option value="date">Date</option>
-                <option value="multi_select">Multi Select</option>
-                <option value="number">Number</option>
-                <option value="rich_text">Rich Text</option>
-                <option value="select">Select</option>
-                <option value="timestamp">Timestamp</option>
-                <option value="status">Status</option>
+                <option value="">Select Column</option>
+                {columns.map((column) => (
+                  <option key={column.Header} value={column.Header}>
+                    {column.Header}
+                  </option>
+                ))}
               </select>
               <select
                 value={rule.operator}
@@ -113,9 +98,10 @@ const AdvancedFilter: React.FC<AdvancedFilterProps> = ({ onApply }) => {
                 <option value="">Select Operator</option>
                 <option value="contains">Contains</option>
                 <option value="equals">Equals</option>
+                {/* Add more operators based on column type */}
               </select>
               {renderFilterInput(
-                rule.property,
+                rule.column,
                 rule.value,
                 (val) => {
                   const newGroups = [...filterGroups];
@@ -136,9 +122,6 @@ const AdvancedFilter: React.FC<AdvancedFilterProps> = ({ onApply }) => {
       ))}
       <button type="button" className={styles.addButton} onClick={handleAddGroup}>
         Add Filter Group
-      </button>
-      <button type="button" className={styles.addButton} onClick={handleApply}>
-        Apply Filters
       </button>
     </div>
   );

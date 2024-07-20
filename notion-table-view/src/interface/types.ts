@@ -5,13 +5,6 @@ export interface Filter {
     operator: string;
     value: any;
   }
-  
-  export interface FilterGroup {
-    id: string;
-    type: 'and' | 'or';
-    filters: (Filter | FilterGroup)[];
-    level: number; // add level property to track nesting level
-  }
 
   export interface Data {
     name: string;
@@ -22,3 +15,38 @@ export interface Filter {
     accountOwner: string;
   }
   
+  export interface ColumnDefinition {
+    Header?: string;
+    type?: 'checkbox' | 'date' | 'multi_select' | 'number' | 'rich_text' | 'select' | 'timestamp' | 'status' | 'text';
+    accessor?: string;
+  }
+  
+  export interface Record {
+    [key: string]: {
+      type: string;
+      value: any;
+    };
+  }
+
+  export interface FilterRule {
+    column: string;
+    operator: string;
+    value: any;
+  }
+  
+  export interface FilterGroup {
+    condition: string;
+    rules: FilterRule[];
+  }
+  
+  export interface AdvancedFilterProps {
+    columns: ColumnDefinition[];
+    onApply: (filters: any) => void;
+  }
+
+  export interface FilterDialogProps {
+    open: boolean;
+    columns: ColumnDefinition[];
+    onClose: () => void;
+    onApply: (filters: any) => void;
+  }

@@ -1,34 +1,18 @@
-// src/components/Filter/FilterDialog.tsx
 import React from 'react';
-import Dialog from '@mui/material/Dialog';
-import DialogActions from '@mui/material/DialogActions';
-import DialogContent from '@mui/material/DialogContent';
-import DialogTitle from '@mui/material/DialogTitle';
-import Button from '@mui/material/Button';
+import { Dialog, DialogTitle, DialogContent, DialogActions, Button } from '@mui/material';
 import AdvancedFilter from './AdvancedFilter';
-import styles from './FilterDialog.module.css';
+import { FilterDialogProps } from '../../interface/types';
 
-interface FilterDialogProps {
-  open: boolean;
-  onClose: () => void;
-  onApply: (filters: any) => void;
-}
-
-const FilterDialog: React.FC<FilterDialogProps> = ({ open, onClose, onApply }) => {
-  const handleApply = (filters: any) => {
-    onApply(filters);
-    onClose();
-  };
-
+const FilterDialog: React.FC<FilterDialogProps> = ({ open, columns, onClose, onApply }) => {
   return (
-    <Dialog open={open} onClose={onClose} fullWidth maxWidth="md">
+    <Dialog open={open} onClose={onClose}>
       <DialogTitle>Advanced Filter</DialogTitle>
-      <DialogContent className={styles.dialogContent}>
-        <AdvancedFilter onApply={handleApply} />
+      <DialogContent>
+        <AdvancedFilter columns={columns} onApply={onApply} />
       </DialogContent>
-      <DialogActions className={styles.dialogActions}>
+      <DialogActions>
         <Button onClick={onClose}>Cancel</Button>
-        <Button onClick={handleApply}>Apply</Button>
+        <Button onClick={onApply}>Apply</Button>
       </DialogActions>
     </Dialog>
   );

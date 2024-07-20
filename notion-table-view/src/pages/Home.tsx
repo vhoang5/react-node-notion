@@ -1,64 +1,58 @@
-// src/pages/Home.tsx
-import React, { useEffect, useState } from 'react';
-import FilterDialog from '../components/Filter/FilterDialog';
-import Table from '../components/Table/Table';
-import Button from '@mui/material/Button';
-import axios from 'axios';
-import './Home.css';
+import React, { useState, useEffect } from 'react';
+import styles from './Home.module.css';
+import TableView from '../components/TableView';
 import { getData } from '../services/apiService';
+import FilterDialog from '../components/Filter/FilterDialog';
+import { ColumnDefinition } from '../interface/types';
 
 const Home: React.FC = () => {
-  const [data, setData] = useState<any[]>([]);
-  const [dialogOpen, setDialogOpen] = useState(false);
+    const [data, setData] = useState<any[]>([]);
+    const [isFilterDialogOpen, setFilterDialogOpen] = useState(false);
+    const [filters, setFilters] = useState<any[]>([]);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const result = await getData();
-        setData(result);
-      } catch (error) {
-        console.error('Error fetching data:', error);
-      } finally {
-      }
+    const columns: ColumnDefinition[] = [
+        { Header: 'Name', accessor: 'name', type: 'text' },
+        { Header: 'Company', accessor: 'company', type: 'text' },
+        { Header: 'Status', accessor: 'status', type: 'status' },
+        { Header: 'Priority', accessor: 'priority', type: 'select' },
+        { Header: 'Estimated Value', accessor: 'estimatedValue', type: 'number' },
+    ];
+
+    useEffect(() => {
+      const fetchData = async () => {
+        try {
+          const result = await getData();
+          setData(result);
+        } catch (error) {
+          console.error('Error fetching data:', error);
+        } finally {
+        }
+      };
+  
+      fetchData();
+    }, []);
+
+    const handleApplyFilter = (appliedFilters: any) => {
+        console.log('Applied Filters:', appliedFilters);
+        setFilters(appliedFilters);
+        setFilterDialogOpen(false);
+        // Apply filter logic here or make an API call with filters
     };
 
-    fetchData();
-  }, []);
+    const handleCloseFilter = () => {
+      setFilterDialogOpen(false);
+    };
+  
 
-  const fetchFilteredData = (filters: any) => {
-    // Convert filters to API request format and fetch data
-    axios.post('/api/data', filters)
-      .then(response => {
-        setData(response.data);
-      })
-      .catch(error => {
-        console.error('Error fetching data:', error);
-      });
-  };
-
-  const handleOpenDialog = () => {
-    setDialogOpen(true);
-  };
-
-  const handleCloseDialog = () => {
-    setDialogOpen(false);
-  };
-
-  return (
-    <div className="home">
-      <h1>Advanced Filter Example</h1>
-      <Button variant="contained" color="primary" onClick={handleOpenDialog}>
-        Open Filter
-      </Button>
-      <FilterDialog
-        open={dialogOpen}
-        onClose={handleCloseDialog}
-        onApply={fetchFilteredData}
-      />
-      <Table data={data} />
-    </div>
-  );
+    return (
+        <div className={styles.home}>
+            <button onClick={() => setFilterDialogOpen(true)}>Open Filters</button>
+            <TableView columns={columns} data={data} />
+            {isFilterDialogOpen && (
+                <FilterDialog open={isFilterDialogOpen} columns={columns} onClose={handleCloseFilter} onApply={handleApplyFilter} />
+            )}
+        </div>
+    );
 };
 
 export default Home;
-
