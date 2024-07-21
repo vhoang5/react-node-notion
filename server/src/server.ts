@@ -2,26 +2,13 @@ require("dotenv").config();
 import http from "http";
 import { Client } from "@notionhq/client";
 
-// This is Typescript  interface for the shape of the object we will
-// create based on our database to send to the React app
-// When the data is queried it will come back in a much more complicated shape, so our goal is to
-// simplify it to make it easy to work with on the front end
-interface ThingToLearn {
-  label: string;
-  url: string;
-}
-
-// The dotenv library will read from your .env file into these values on `process.env`
 const notionDatabaseId = process.env.NOTION_DATABASE_ID;
 const notionSecret = process.env.NOTION_SECRET;
 
-// Will provide an error to users who forget to create the .env file
-// with their Notion data in it
 if (!notionDatabaseId || !notionSecret) {
   throw Error("Must define NOTION_SECRET and NOTION_DATABASE_ID in env");
 }
 
-// Initializing the Notion client with your secret
 const notion = new Client({
   auth: notionSecret,
 });
@@ -29,65 +16,71 @@ const notion = new Client({
 const host = "localhost";
 const port = 8000;
 
-// Require an async function here to support await with the DB query
 const server = http.createServer(async (req, res) => {
   res.setHeader("Access-Control-Allow-Origin", "*");
+  res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type");
 
-  switch (req.url) {
-    case "/":
-      // Query the database and wait for the result
+  if (req.method === "OPTIONS") {
+    res.writeHead(204); // No content
+    res.end();
+    return;
+  }
+
+  if (req.method === "POST" && req.url === "/") {
+    let body = "";
+    req.on("data", chunk => {
+      body += chunk.toString();
+    });
+
+    req.on("end", async () => {
+      try {
+        const filters = JSON.parse(body);
+
+        const query = await notion.databases.query({
+          database_id: notionDatabaseId,
+          filter: filters,
+        });
+
+        const list = query.results.map(row => mapNotionData(row.properties));
+
+        res.writeHead(200);
+        res.end(JSON.stringify(list));
+      } catch (error) {
+        console.error('Error processing request:', error);
+        res.writeHead(400);
+        res.end(JSON.stringify({ error: "Invalid request body" }));
+      }
+    });
+  } else if (req.method === "GET" && req.url === "/") {
+    try {
       const query = await notion.databases.query({
         database_id: notionDatabaseId,
       });
 
-      // We map over the complex shape of the results and return a nice clean array of
-      // objects in the shape of our `ThingToLearn` interface
-      
-      const list: any[] = query.results.map((row) => {
-        // // row represents a row in our database and the name of the column is the
-        // // way to reference the data in that column
-        // const labelCell = row.properties.label;
-        // const urlCell = row.properties.url;
+      const list = query.results.map(row => mapNotionData(row.properties));
 
-        // // Depending on the column "type" we selected in Notion there will be different
-        // // data available to us (URL vs Date vs text for example) so in order for Typescript
-        // // to safely infer we have to check the `type` value.  We had one text and one url column.
-        // const isLabel = labelCell?.type === "rich_text";
-        // const isUrl = urlCell?.type === "url";
-
-        // // Verify the types are correct
-        // if (isLabel && isUrl) {
-        //   // Pull the string values of the cells off the column data
-        //   const label = labelCell.rich_text?.[0].plain_text;
-        //   const url = urlCell.url ?? "";
-
-        //   // Return it in our `ThingToLearn` shape
-        //   return { label, url };
-        // }
-        return mapNotionData(row.properties);
-
-      });
-
-      res.setHeader("Content-Type", "application/json");
       res.writeHead(200);
       res.end(JSON.stringify(list));
-      break;
-
-    default:
-      res.setHeader("Content-Type", "application/json");
-      res.writeHead(404);
-      res.end(JSON.stringify({ error: "Resource not found" }));
+    } catch (error) {
+      console.error('Error querying Notion database:', error);
+      res.writeHead(500);
+      res.end(JSON.stringify({ error: "Error querying Notion database" }));
+    }
+  } else {
+    res.writeHead(404);
+    res.end(JSON.stringify({ error: "Resource not found" }));
   }
 });
 
 function mapNotionData(data: any) {
   return {
-    status: data.Status?.status?.name || null,
-    accountOwner: data["Account Owner"]?.rich_text?.[0]?.plain_text || null,
-    company: data.Company?.rich_text?.[0]?.plain_text || null,
-    priority: data.Priority?.select?.name || null,
-    estimatedValue: data["Estimated Value"]?.number || null,
-    name: data.Name?.title?.[0]?.plain_text || null
+    status: data.status?.status?.name || null,
+    accountOwner: data["account owner"]?.rich_text?.[0]?.plain_text || null,
+    company: data.company?.rich_text?.[0]?.plain_text || null,
+    priority: data.priority?.select?.name || null,
+    estimatedValue: data["estimated value"]?.number || null,
+    name: data.name?.title?.[0]?.plain_text || null
   };
 }
 

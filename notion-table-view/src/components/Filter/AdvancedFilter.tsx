@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import CheckboxFilter from './CheckboxFilter';
 import DateFilter from './DateFilter';
 import MultiSelectFilter from './MultiSelectFilter';
@@ -8,18 +8,16 @@ import SelectFilter from './SelectFilter';
 import TimestampFilter from './TimestampFilter';
 import StatusFilter from './StatusFilter';
 import styles from './AdvancedFilter.module.css';
-import { Column, FilterGroup, FilterRule } from '../../interface/types';
+import { Column, FilterGroup } from '../../interface/types';
 
 interface AdvancedFilterProps {
   columns: Column[];
   maxDepth: number;
+  filterGroups: FilterGroup[];
+  setFilterGroups: React.Dispatch<React.SetStateAction<FilterGroup[]>>;
 }
 
-const AdvancedFilter: React.FC<AdvancedFilterProps> = ({ columns, maxDepth }) => {
-  const [filterGroups, setFilterGroups] = useState<FilterGroup[]>([
-    { condition: 'AND', filterRules: [{ column: '', operator: '', value: '' }], filterGroups: [] }
-  ]);
-  
+const AdvancedFilter: React.FC<AdvancedFilterProps> = ({ columns, maxDepth, filterGroups, setFilterGroups }) => {
   const initializeGroupPath = (groupPath: number[], groups: FilterGroup[]): FilterGroup[] => {
     let currentGroup = groups;
     groupPath.forEach((index) => {
@@ -30,27 +28,27 @@ const AdvancedFilter: React.FC<AdvancedFilterProps> = ({ columns, maxDepth }) =>
     });
     return currentGroup;
   };
-  
+
   const handleAddRule = (groupIndex: number, groupPath: number[]) => {
-    setFilterGroups(prevGroups => {
+    setFilterGroups((prevGroups: FilterGroup[]) => {
       const newGroups = JSON.parse(JSON.stringify(prevGroups));
       let currentGroup = initializeGroupPath(groupPath, newGroups);
-      currentGroup[groupIndex].filterRules.push({ column: '', operator: '', value: '' });
+      currentGroup[groupIndex].filterRules.push({ column: '', operator: 'contains', value: '' });
       return newGroups;
     });
   };
-  
+
   const handleAddGroup = (groupIndex: number, groupPath: number[]) => {
-    setFilterGroups(prevGroups => {
+    setFilterGroups((prevGroups: FilterGroup[]) => {
       const newGroups = JSON.parse(JSON.stringify(prevGroups));
       let currentGroup = initializeGroupPath(groupPath, newGroups);
-      currentGroup[groupIndex].filterGroups.push({ condition: 'AND', filterRules: [{ column: '', operator: '', value: '' }], filterGroups: [] });
+      currentGroup[groupIndex].filterGroups.push({ condition: 'AND', filterRules: [{ column: '', operator: 'contains', value: '' }], filterGroups: [] });
       return newGroups;
     });
   };
-  
+
   const handleRemoveRule = (groupIndex: number, ruleIndex: number, groupPath: number[]) => {
-    setFilterGroups(prevGroups => {
+    setFilterGroups((prevGroups: FilterGroup[]) => {
       const newGroups = JSON.parse(JSON.stringify(prevGroups));
       let currentGroup = initializeGroupPath(groupPath, newGroups);
       currentGroup[groupIndex].filterRules.splice(ruleIndex, 1);
@@ -97,7 +95,7 @@ const AdvancedFilter: React.FC<AdvancedFilterProps> = ({ columns, maxDepth }) =>
       case 'status':
         return <StatusFilter value={value} onChange={onChange} options={[]} />;
       default:
-        return <RichTextFilter value={value} onChange={onChange} />;
+        return <input type="text" value={value} onChange={(e) => onChange(e.target.value)} />;
     }
   };
 
@@ -107,7 +105,7 @@ const AdvancedFilter: React.FC<AdvancedFilterProps> = ({ columns, maxDepth }) =>
         <select
           value={group.condition}
           onChange={(e) => {
-            setFilterGroups(prevGroups => {
+            setFilterGroups((prevGroups: FilterGroup[]) => {
               const newGroups = JSON.parse(JSON.stringify(prevGroups));
               let currentGroup = initializeGroupPath(groupPath, newGroups);
               currentGroup[groupIndex].condition = e.target.value;
@@ -124,7 +122,7 @@ const AdvancedFilter: React.FC<AdvancedFilterProps> = ({ columns, maxDepth }) =>
               <select
                 value={rule.column}
                 onChange={(e) => {
-                  setFilterGroups(prevGroups => {
+                  setFilterGroups((prevGroups: FilterGroup[]) => {
                     const newGroups = JSON.parse(JSON.stringify(prevGroups));
                     let currentGroup = initializeGroupPath(groupPath, newGroups);
                     currentGroup[groupIndex].filterRules[ruleIndex].column = e.target.value;
@@ -142,7 +140,7 @@ const AdvancedFilter: React.FC<AdvancedFilterProps> = ({ columns, maxDepth }) =>
               <select
                 value={rule.operator}
                 onChange={(e) => {
-                  setFilterGroups(prevGroups => {
+                  setFilterGroups((prevGroups: FilterGroup[]) => {
                     const newGroups = JSON.parse(JSON.stringify(prevGroups));
                     let currentGroup = initializeGroupPath(groupPath, newGroups);
                     currentGroup[groupIndex].filterRules[ruleIndex].operator = e.target.value;
@@ -158,7 +156,7 @@ const AdvancedFilter: React.FC<AdvancedFilterProps> = ({ columns, maxDepth }) =>
               </select>
               <div className={styles.filterInput}>
                 {renderFilterInput(rule.column, rule.value, (val) => {
-                  setFilterGroups(prevGroups => {
+                  setFilterGroups((prevGroups: FilterGroup[]) => {
                     const newGroups = JSON.parse(JSON.stringify(prevGroups));
                     let currentGroup = initializeGroupPath(groupPath, newGroups);
                     currentGroup[groupIndex].filterRules[ruleIndex].value = val;
@@ -202,7 +200,7 @@ const AdvancedFilter: React.FC<AdvancedFilterProps> = ({ columns, maxDepth }) =>
       </div>
     ));
   };
-  
+
   return (
     <div className={styles.advancedFilter}>
       {renderFilterGroups(filterGroups, 1)}

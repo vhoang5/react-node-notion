@@ -1,12 +1,12 @@
 import React from 'react';
-import './App.css';
 import Home from './pages/Home';
+import { FilterProvider } from './context/FilterContext'; // Adjust import path as needed
 
 const App: React.FC = () => {
   return (
-    <div className="App">
+    <FilterProvider>
       <Home />
-    </div>
+    </FilterProvider>
   );
 };
 
