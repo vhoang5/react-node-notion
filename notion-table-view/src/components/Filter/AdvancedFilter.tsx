@@ -76,6 +76,7 @@ const AdvancedFilter: React.FC<AdvancedFilterProps> = ({ columns, maxDepth, filt
     }
   };
 
+  // Todo: need to get list option from data
   const renderFilterInput = (columnType: string, value: any, onChange: (val: any) => void) => {
     switch (columnType) {
       case 'checkbox':
@@ -83,17 +84,17 @@ const AdvancedFilter: React.FC<AdvancedFilterProps> = ({ columns, maxDepth, filt
       case 'date':
         return <DateFilter value={value} onChange={onChange} />;
       case 'multi_select':
-        return <MultiSelectFilter value={value} onChange={onChange} options={[]} />;
+        return <MultiSelectFilter value={value} onChange={onChange} options={['option1', 'option2']} />;
       case 'number':
         return <NumberFilter value={value} onChange={onChange} />;
       case 'rich_text':
         return <RichTextFilter value={value} onChange={onChange} />;
       case 'select':
-        return <SelectFilter value={value} onChange={onChange} options={[]} />;
+        return <SelectFilter value={value} onChange={onChange} options={['option1', 'option2']} />;
       case 'timestamp':
         return <TimestampFilter value={value} onChange={onChange} />;
       case 'status':
-        return <StatusFilter value={value} onChange={onChange} options={[]} />;
+        return <StatusFilter value={value} onChange={onChange} options={['option1', 'option2']} />;
       default:
         return <input type="text" value={value} onChange={(e) => onChange(e.target.value)} />;
     }
