@@ -1,7 +1,14 @@
 import React from 'react';
 import { Dialog, DialogTitle, DialogContent, DialogActions, Button } from '@mui/material';
 import AdvancedFilter from './AdvancedFilter';
-import { FilterDialogProps } from '../../interface/types';
+import { Column } from '../../interface/types';
+
+interface FilterDialogProps {
+  open: boolean;
+  columns: Column[];
+  onClose: () => void;
+  onApply: (filters: any) => void;
+}
 
 const FilterDialog: React.FC<FilterDialogProps> = ({ open, columns, onClose, onApply }) => {
   return (

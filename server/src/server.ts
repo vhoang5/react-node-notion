@@ -66,12 +66,13 @@ const server = http.createServer(async (req, res) => {
 
         // If a row is found that does not match the rules we checked it will still return in the
         // the expected shape but with a NOT_FOUND label
-        const {properties : { Name }} = row;
-        const value = (Name as any)?.title[0].plain_text;
+        const {properties : { Name, Company }} = row;
+        const valueName = (Name as any)?.title[0].plain_text;
+        const valueCompany = (Company as any)?.rich_text[0].plain_text;
         console.log("-------------------\n");
         console.log(row.properties);
         console.log("-------------------\n");
-        return {name: value};
+        return {name: valueName, company: valueCompany};
       });
 
       res.setHeader("Content-Type", "application/json");

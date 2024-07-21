@@ -9,7 +9,12 @@ import SelectFilter from './SelectFilter';
 import TimestampFilter from './TimestampFilter';
 import StatusFilter from './StatusFilter';
 import styles from './AdvancedFilter.module.css';
-import { AdvancedFilterProps, FilterGroup } from '../../interface/types';
+import { Column, FilterGroup } from '../../interface/types';
+
+interface AdvancedFilterProps {
+  columns: Column[];
+  onApply: (filters: any) => void;
+}
 
 const AdvancedFilter: React.FC<AdvancedFilterProps> = ({ columns, onApply }) => {
   const [filterGroups, setFilterGroups] = useState<FilterGroup[]>([
@@ -31,9 +36,7 @@ const AdvancedFilter: React.FC<AdvancedFilterProps> = ({ columns, onApply }) => 
   };
 
   const renderFilterInput = (column: string, value: any, onChange: (val: any) => void) => {
-    const columnType = columns.find((col) => col.accessor === column)?.type;
-
-    switch (columnType) {
+    switch (column) {
       case 'checkbox':
         return <CheckboxFilter value={value} onChange={onChange} />;
       case 'date':
@@ -82,8 +85,8 @@ const AdvancedFilter: React.FC<AdvancedFilterProps> = ({ columns, onApply }) => 
               >
                 <option value="">Select Column</option>
                 {columns.map((column) => (
-                  <option key={column.accessor} value={column.accessor}>
-                    {column.header}
+                  <option key={column.type} value={column.type}>
+                    {column.headerName}
                   </option>
                 ))}
               </select>

@@ -40,12 +40,13 @@ const Home = () => {
     <div className={styles.container}>
       <h1>Data Table</h1>
       <button onClick={() => setShowFilter(true)}>Show Filters</button>
-      <TableView columns={columns} data={data} filters={filters} />
+      <TableView columns={columns} data={data} />
       {showFilter && (
         <FilterDialog
+          open = {showFilter}
           columns={columns}
-          onApplyFilters={applyFilters}
           onClose={() => setShowFilter(false)}
+          onApply={applyFilters}
         />
       )}
     </div>

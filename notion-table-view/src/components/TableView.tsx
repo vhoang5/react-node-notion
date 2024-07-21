@@ -1,22 +1,46 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { AgGridReact } from 'ag-grid-react';
 import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-alpine.css';
 import styles from './TableView.module.css';
+import { Column, DataRecord } from '../interface/types';
 
-const TableView = ({ columns, data, filters }) => {
-  // Apply filters to the data (optional, depending on how you want to handle it)
-  const filteredData = data; // Apply your filter logic here if necessary
+interface TableProps {
+  columns: Column[];
+  data: DataRecord[];
+}
+
+const TableView: React.FC<TableProps> = ({ columns, data }) => {
+  const defaultColDef = useMemo(() => ({
+    sortable: true,
+    resizable: true,
+    filter: true,
+  }), []);
+
+  // Map the data to the format expected by ag-grid
+  const rowData = data.map(record => {
+    const row: { [key: string]: any } = {};
+    Object.keys(record).forEach(key => {
+      row[key] = record[key];
+    });
+    return row;
+  });
+
+  // Define columns for ag-grid
+  const agColumns = columns.map(col => ({
+    headerName: col.headerName,
+    field: col.field,
+    sortable: true,
+    filter: true,
+    resizable: true,
+  }));
 
   return (
-    <div className={`ag-theme-alpine ${styles.tableContainer}`}>
+    <div className={`ag-theme-alpine ${styles.tableContainer}`} style={{ height: 400, width: '100%' }}>
       <AgGridReact
-        columnDefs={columns}
-        rowData={filteredData}
-        defaultColDef={{
-          sortable: true,
-          resizable: true,
-        }}
+        columnDefs={agColumns}
+        rowData={rowData}
+        defaultColDef={defaultColDef}
       />
     </div>
   );
