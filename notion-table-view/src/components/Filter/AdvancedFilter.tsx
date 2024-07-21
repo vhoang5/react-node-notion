@@ -1,4 +1,3 @@
-// src/components/Filter/AdvancedFilter.tsx
 import React, { useState } from 'react';
 import CheckboxFilter from './CheckboxFilter';
 import DateFilter from './DateFilter';
@@ -33,6 +32,26 @@ const AdvancedFilter: React.FC<AdvancedFilterProps> = ({ columns, onApply }) => 
 
   const handleApply = () => {
     onApply(filterGroups);
+  };
+
+  const getOperators = (columnType: string) => {
+    switch (columnType) {
+      case 'checkbox':
+        return ['is checked', 'is not checked'];
+      case 'date':
+      case 'timestamp':
+        return ['is', 'is not', 'is before', 'is after', 'is on or before', 'is on or after', 'is empty', 'is not empty', 'is within the past', 'is within the next'];
+      case 'multi_select':
+      case 'select':
+      case 'status':
+        return ['contains', 'does not contain', 'is empty', 'is not empty'];
+      case 'number':
+        return ['equals', 'does not equal', 'is greater than', 'is less than', 'is greater than or equal to', 'is less than or equal to', 'is empty', 'is not empty'];
+      case 'rich_text':
+        return ['contains', 'does not contain', 'is empty', 'is not empty'];
+      default:
+        return ['contains', 'does not contain', 'is empty', 'is not empty'];
+    }
   };
 
   const renderFilterInput = (column: string, value: any, onChange: (val: any) => void) => {
@@ -83,7 +102,6 @@ const AdvancedFilter: React.FC<AdvancedFilterProps> = ({ columns, onApply }) => 
                   setFilterGroups(newGroups);
                 }}
               >
-                <option value="">Select Column</option>
                 {columns.map((column) => (
                   <option key={column.type} value={column.type}>
                     {column.headerName}
@@ -98,10 +116,11 @@ const AdvancedFilter: React.FC<AdvancedFilterProps> = ({ columns, onApply }) => 
                   setFilterGroups(newGroups);
                 }}
               >
-                <option value="">Select Operator</option>
-                <option value="contains">Contains</option>
-                <option value="equals">Equals</option>
-                {/* Add more operators based on column type */}
+                {getOperators(rule.column).map((operator) => (
+                  <option key={operator} value={operator}>
+                    {operator}
+                  </option>
+                ))}
               </select>
               {renderFilterInput(
                 rule.column,

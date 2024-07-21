@@ -5,8 +5,8 @@ import FilterDialog from '../components/Filter/FilterDialog';
 import TableView from '../components/TableView';
 
 const columns = [
-  { headerName: 'Name', field: 'name', type: 'text' },
-  { headerName: 'Company', field: 'company', type: 'text' },
+  { headerName: 'Name', field: 'name', type: 'rich_text' },
+  { headerName: 'Company', field: 'company', type: 'rich_text' },
   { headerName: 'Status', field: 'status', type: 'status' },
   { headerName: 'Priority', field: 'priority', type: 'select' },
   { headerName: 'Estimated Value', field: 'estimatedValue', type: 'number' },

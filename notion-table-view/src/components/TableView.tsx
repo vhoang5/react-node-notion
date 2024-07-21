@@ -33,6 +33,7 @@ const TableView: React.FC<TableProps> = ({ columns, data }) => {
     sortable: true,
     filter: true,
     resizable: true,
+    type: col.type
   }));
 
   return (
