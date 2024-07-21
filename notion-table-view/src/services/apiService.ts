@@ -1,13 +1,12 @@
-// src/services/apiService.ts
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: 'http://localhost:8000/', // replace with your API base URL
+  baseURL: 'http://localhost:8000/',
 });
 
 export const getData = async () => {
   try {
-    const response = await api.get(''); // replace with your API endpoint
+    const response = await api.get('');
     return response.data;
   } catch (error) {
     console.error('Error fetching data:', error);

@@ -9,6 +9,18 @@ interface TableProps {
   columns: Column[];
   data: DataRecord[];
 }
+const ROW_HEIGHT = 40;
+
+const notionToAgGridTypeMap: { [key: string]: string } = {
+  checkbox: 'boolean',
+  date: 'date',
+  multi_select: 'text',
+  number: 'number',
+  rich_text: 'text',
+  select: 'text',
+  timestamp: 'date',
+  status: 'text'
+};
 
 const TableView: React.FC<TableProps> = ({ columns, data }) => {
   const defaultColDef = useMemo(() => ({
@@ -17,7 +29,21 @@ const TableView: React.FC<TableProps> = ({ columns, data }) => {
     filter: true,
   }), []);
 
-  // Map the data to the format expected by ag-grid
+  const columnTypes = useMemo(() => ({
+    text: { 
+      cellRenderer: (params: any) => params.value || '',
+    },
+    number: {
+      valueFormatter: (params: any) => params.value ? params.value.toFixed(2) : '',
+    },
+    boolean: {
+      cellRenderer: (params: any) => params.value ? '✔️' : '❌',
+    },
+    date: {
+      valueFormatter: (params: any) => params.value ? new Date(params.value).toLocaleDateString() : '',
+    }
+  }), []);
+
   const rowData = data.map(record => {
     const row: { [key: string]: any } = {};
     Object.keys(record).forEach(key => {
@@ -26,22 +52,27 @@ const TableView: React.FC<TableProps> = ({ columns, data }) => {
     return row;
   });
 
-  // Define columns for ag-grid
   const agColumns = columns.map(col => ({
     headerName: col.headerName,
     field: col.field,
     sortable: true,
     filter: true,
     resizable: true,
-    type: col.type
+    flex: 1, 
+    type: notionToAgGridTypeMap[col.type] || 'text'
   }));
 
+  const gridHeight = (data.length > 10 ? 10: data.length) * ROW_HEIGHT + 120; 
+
   return (
-    <div className={`ag-theme-alpine ${styles.tableContainer}`} style={{ height: 400, width: '100%' }}>
+    <div className={`ag-theme-alpine ${styles.tableContainer}`} style={{ height: gridHeight, width: '100%' }}>
       <AgGridReact
         columnDefs={agColumns}
         rowData={rowData}
         defaultColDef={defaultColDef}
+        pagination={true}
+        paginationPageSize={10}
+        columnTypes={columnTypes}
       />
     </div>
   );

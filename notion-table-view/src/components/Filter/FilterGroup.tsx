@@ -1,4 +1,3 @@
-// src/components/Filter/FilterGroup.tsx
 import React, { useState } from 'react';
 import FilterRule from './FilterRule';
 import './FilterGroup.css';

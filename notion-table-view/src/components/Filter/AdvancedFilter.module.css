@@ -1,24 +1,62 @@
-.container {
-    padding: 20px;
-  }
-  
-  .filterGroup {
-    margin-bottom: 15px;
-  }
-  
-  .filterRule {
-    display: flex;
-    align-items: center;
-    margin-bottom: 10px;
-  }
-  
-  .filterRule select,
-  .filterRule input {
-    margin-right: 10px;
-    padding: 5px;
-  }
-  
-  .addButton {
-    margin-top: 10px;
-    margin-right: 5px;
-  }
+.advancedFilter {
+  padding: 20px;
+}
+
+.filterGroup {
+  border: 1px solid #ddd;
+  padding: 10px;
+  margin-bottom: 10px;
+}
+
+.filterRule {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.filterRule select {
+  height: 40px;
+  margin-right: 10px;
+  padding: 0px;
+}
+
+.filterRule input {
+  height: 40px;
+  min-width: 150px;
+  margin-right: 10px;
+  padding: 0px 10px;
+}
+
+.filterRule button {
+  height: 40px;
+}
+
+.filterInput{
+  min-width: 250px;
+}
+
+.actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.addButton, .removeButton, .applyButton {
+  background-color: #f0f0f0;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  padding: 10px;
+  cursor: pointer;
+  height: 40px;
+}
+
+.applyButton {
+  background-color: #007bff;
+  border: none;
+  color: #fff;
+  padding: 10px 20px;
+}
+
+.filterCondition{
+  padding: 0px !important;
+}

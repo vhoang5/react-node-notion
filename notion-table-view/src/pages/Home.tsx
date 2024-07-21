@@ -39,7 +39,7 @@ const Home = () => {
   return (
     <div className={styles.container}>
       <h1>Data Table</h1>
-      <button onClick={() => setShowFilter(true)}>Show Filters</button>
+      <button onClick={() => setShowFilter(true)} className={styles.fillerButton}>Show Filters</button>
       <TableView columns={columns} data={data} />
       {showFilter && (
         <FilterDialog

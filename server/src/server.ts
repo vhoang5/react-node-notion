@@ -42,37 +42,30 @@ const server = http.createServer(async (req, res) => {
 
       // We map over the complex shape of the results and return a nice clean array of
       // objects in the shape of our `ThingToLearn` interface
+      
       const list: any[] = query.results.map((row) => {
-        // row represents a row in our database and the name of the column is the
-        // way to reference the data in that column
-        const labelCell = row.properties.label;
-        const urlCell = row.properties.url;
+        // // row represents a row in our database and the name of the column is the
+        // // way to reference the data in that column
+        // const labelCell = row.properties.label;
+        // const urlCell = row.properties.url;
 
-        // Depending on the column "type" we selected in Notion there will be different
-        // data available to us (URL vs Date vs text for example) so in order for Typescript
-        // to safely infer we have to check the `type` value.  We had one text and one url column.
-        const isLabel = labelCell?.type === "rich_text";
-        const isUrl = urlCell?.type === "url";
+        // // Depending on the column "type" we selected in Notion there will be different
+        // // data available to us (URL vs Date vs text for example) so in order for Typescript
+        // // to safely infer we have to check the `type` value.  We had one text and one url column.
+        // const isLabel = labelCell?.type === "rich_text";
+        // const isUrl = urlCell?.type === "url";
 
-        // Verify the types are correct
-        if (isLabel && isUrl) {
-          // Pull the string values of the cells off the column data
-          const label = labelCell.rich_text?.[0].plain_text;
-          const url = urlCell.url ?? "";
+        // // Verify the types are correct
+        // if (isLabel && isUrl) {
+        //   // Pull the string values of the cells off the column data
+        //   const label = labelCell.rich_text?.[0].plain_text;
+        //   const url = urlCell.url ?? "";
 
-          // Return it in our `ThingToLearn` shape
-          return { label, url };
-        }
+        //   // Return it in our `ThingToLearn` shape
+        //   return { label, url };
+        // }
+        return mapNotionData(row.properties);
 
-        // If a row is found that does not match the rules we checked it will still return in the
-        // the expected shape but with a NOT_FOUND label
-        const {properties : { Name, Company }} = row;
-        const valueName = (Name as any)?.title[0].plain_text;
-        const valueCompany = (Company as any)?.rich_text[0].plain_text;
-        console.log("-------------------\n");
-        console.log(row.properties);
-        console.log("-------------------\n");
-        return {name: valueName, company: valueCompany};
       });
 
       res.setHeader("Content-Type", "application/json");
@@ -86,6 +79,17 @@ const server = http.createServer(async (req, res) => {
       res.end(JSON.stringify({ error: "Resource not found" }));
   }
 });
+
+function mapNotionData(data: any) {
+  return {
+    status: data.Status?.status?.name || null,
+    accountOwner: data["Account Owner"]?.rich_text?.[0]?.plain_text || null,
+    company: data.Company?.rich_text?.[0]?.plain_text || null,
+    priority: data.Priority?.select?.name || null,
+    estimatedValue: data["Estimated Value"]?.number || null,
+    name: data.Name?.title?.[0]?.plain_text || null
+  };
+}
 
 server.listen(port, host, () => {
   console.log(`Server is running on http://${host}:${port}`);
