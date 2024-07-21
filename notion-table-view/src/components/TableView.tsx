@@ -1,55 +1,25 @@
 import React from 'react';
-import { useTable, useSortBy } from 'react-table';
+import { AgGridReact } from 'ag-grid-react';
+import 'ag-grid-community/styles/ag-grid.css';
+import 'ag-grid-community/styles/ag-theme-alpine.css';
 import styles from './TableView.module.css';
 
-interface TableViewProps {
-    columns: any;
-    data: any;
-}
+const TableView = ({ columns, data, filters }) => {
+  // Apply filters to the data (optional, depending on how you want to handle it)
+  const filteredData = data; // Apply your filter logic here if necessary
 
-const TableView: React.FC<TableViewProps> = ({ columns, data }) => {
-    const {
-        getTableProps,
-        getTableBodyProps,
-        headerGroups,
-        rows,
-        prepareRow,
-    } = useTable({ columns, data }, useSortBy);
-
-    return (
-        <table {...getTableProps()} className={styles.table}>
-            <thead>
-                {headerGroups.map(headerGroup => (
-                    <tr {...headerGroup.getHeaderGroupProps()}>
-                        {headerGroup.headers.map((column: any) => (
-                            <th {...column.getHeaderProps(column.getSortByToggleProps())}>
-                                {column.render('Header')}
-                                <span>
-                                    {column.isSorted
-                                        ? column.isSortedDesc
-                                            ? ' 🔽'
-                                            : ' 🔼'
-                                        : ''}
-                                </span>
-                            </th>
-                        ))}
-                    </tr>
-                ))}
-            </thead>
-            <tbody {...getTableBodyProps()}>
-                {rows.map(row => {
-                    prepareRow(row);
-                    return (
-                        <tr {...row.getRowProps()}>
-                            {row.cells.map(cell => (
-                                <td {...cell.getCellProps()}>{cell.render('Cell')}</td>
-                            ))}
-                        </tr>
-                    );
-                })}
-            </tbody>
-        </table>
-    );
+  return (
+    <div className={`ag-theme-alpine ${styles.tableContainer}`}>
+      <AgGridReact
+        columnDefs={columns}
+        rowData={filteredData}
+        defaultColDef={{
+          sortable: true,
+          resizable: true,
+        }}
+      />
+    </div>
+  );
 };
 
 export default TableView;

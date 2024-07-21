@@ -83,7 +83,7 @@ const AdvancedFilter: React.FC<AdvancedFilterProps> = ({ columns, onApply }) => 
                 <option value="">Select Column</option>
                 {columns.map((column) => (
                   <option key={column.accessor} value={column.accessor}>
-                    {column.Header}
+                    {column.header}
                   </option>
                 ))}
               </select>

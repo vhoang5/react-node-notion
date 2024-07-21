@@ -16,7 +16,7 @@ export interface Filter {
   }
   
   export interface ColumnDefinition {
-    Header?: string;
+    header?: string;
     type?: 'checkbox' | 'date' | 'multi_select' | 'number' | 'rich_text' | 'select' | 'timestamp' | 'status' | 'text';
     accessor?: string;
   }

@@ -1,17 +1,43 @@
-.table {
+.tableContainer {
+    overflow-x: auto;
+  }
+  
+  .table {
     width: 100%;
     border-collapse: collapse;
-}
-
-th, td {
+  }
+  
+  th, td {
     border: 1px solid #ddd;
     padding: 8px;
-}
-
-th {
-    cursor: pointer;
-}
-
-th span {
-    margin-left: 10px;
-}
+  }
+  
+  th {
+    background-color: #f2f2f2;
+    position: relative;
+  }
+  
+  .header {
+    display: flex;
+    align-items: center;
+  }
+  
+  .dragHandle {
+    cursor: move;
+    margin-right: 10px;
+  }
+  
+  .resizable {
+    display: inline-block;
+    width: 100%;
+  }
+  
+  .resizer {
+    width: 5px;
+    height: 100%;
+    position: absolute;
+    right: 0;
+    top: 0;
+    cursor: ew-resize;
+  }
+  
