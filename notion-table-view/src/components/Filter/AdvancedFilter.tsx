@@ -12,55 +12,50 @@ import { Column, FilterGroup, FilterRule } from '../../interface/types';
 
 interface AdvancedFilterProps {
   columns: Column[];
-  onApply: (filters: any) => void;
   maxDepth: number;
 }
 
-const AdvancedFilter: React.FC<AdvancedFilterProps> = ({ columns, onApply, maxDepth }) => {
+const AdvancedFilter: React.FC<AdvancedFilterProps> = ({ columns, maxDepth }) => {
   const [filterGroups, setFilterGroups] = useState<FilterGroup[]>([
-    { condition: 'AND', rules: [{ column: '', operator: '', value: '' }] as FilterRule[] }
+    { condition: 'AND', filterRules: [{ column: '', operator: '', value: '' }], filterGroups: [] }
   ]);
-
+  
   const initializeGroupPath = (groupPath: number[], groups: FilterGroup[]): FilterGroup[] => {
     let currentGroup = groups;
     groupPath.forEach((index) => {
       if (!currentGroup[index]) {
-        currentGroup[index] = { condition: 'AND', rules: [] };
+        currentGroup[index] = { condition: 'AND', filterRules: [], filterGroups: [] };
       }
-      currentGroup = currentGroup[index].rules as FilterGroup[];
+      currentGroup = currentGroup[index].filterGroups;
     });
     return currentGroup;
   };
-
+  
   const handleAddRule = (groupIndex: number, groupPath: number[]) => {
     setFilterGroups(prevGroups => {
       const newGroups = JSON.parse(JSON.stringify(prevGroups));
       let currentGroup = initializeGroupPath(groupPath, newGroups);
-      (currentGroup[groupIndex].rules as FilterRule[]).push({ column: '', operator: '', value: '' });
+      currentGroup[groupIndex].filterRules.push({ column: '', operator: '', value: '' });
       return newGroups;
     });
   };
-
+  
   const handleAddGroup = (groupIndex: number, groupPath: number[]) => {
     setFilterGroups(prevGroups => {
       const newGroups = JSON.parse(JSON.stringify(prevGroups));
       let currentGroup = initializeGroupPath(groupPath, newGroups);
-      (currentGroup[groupIndex].rules as (FilterRule | FilterGroup)[]).push({ condition: 'AND', rules: [{ column: '', operator: '', value: '' }] });
+      currentGroup[groupIndex].filterGroups.push({ condition: 'AND', filterRules: [{ column: '', operator: '', value: '' }], filterGroups: [] });
       return newGroups;
     });
   };
-
+  
   const handleRemoveRule = (groupIndex: number, ruleIndex: number, groupPath: number[]) => {
     setFilterGroups(prevGroups => {
       const newGroups = JSON.parse(JSON.stringify(prevGroups));
       let currentGroup = initializeGroupPath(groupPath, newGroups);
-      currentGroup[groupIndex].rules.splice(ruleIndex, 1);
+      currentGroup[groupIndex].filterRules.splice(ruleIndex, 1);
       return newGroups;
     });
-  };
-
-  const handleApply = () => {
-    onApply(filterGroups);
   };
 
   const getOperators = (columnType: string) => {
@@ -121,70 +116,71 @@ const AdvancedFilter: React.FC<AdvancedFilterProps> = ({ columns, onApply, maxDe
           }}
         >
           <option value="AND">AND</option>
-          <option value="OR">OR</option>    
+          <option value="OR">OR</option>
         </select>
-        {group.rules.map((rule, ruleIndex) => (
+        {group.filterRules.map((rule, ruleIndex) => (
           <div key={ruleIndex} className={styles.filterRule}>
-            {typeof rule === 'object' && 'condition' in rule ? (
-              depth < maxDepth ? renderFilterGroups([rule], depth + 1, [...groupPath, groupIndex]) : null
-            ) : (
-              <>
-                <select
-                  value={rule.column}
-                  onChange={(e) => {
-                    setFilterGroups(prevGroups => {
-                      const newGroups = JSON.parse(JSON.stringify(prevGroups));
-                      let currentGroup = initializeGroupPath(groupPath, newGroups);
-                      (currentGroup[groupIndex].rules as FilterRule[])[ruleIndex].column = e.target.value;
-                      return newGroups;
-                    });
-                  }}
-                >
-                  <option value="">Select Column</option>
-                  {columns.map((column) => (
-                    <option key={column.field} value={column.field}>
-                      {column.headerName}
-                    </option>
-                  ))}
-                </select>
-                <select
-                  value={rule.operator}
-                  onChange={(e) => {
-                    setFilterGroups(prevGroups => {
-                      const newGroups = JSON.parse(JSON.stringify(prevGroups));
-                      let currentGroup = initializeGroupPath(groupPath, newGroups);
-                      (currentGroup[groupIndex].rules as FilterRule[])[ruleIndex].operator = e.target.value;
-                      return newGroups;
-                    });
-                  }}
-                >
-                  {getOperators(rule.column).map((operator) => (
-                    <option key={operator} value={operator}>
-                      {operator}
-                    </option>
-                  ))}
-                </select>
-                <div className={styles.filterInput}>
-                  {renderFilterInput(rule.column, rule.value, (val) => {
-                    setFilterGroups(prevGroups => {
-                      const newGroups = JSON.parse(JSON.stringify(prevGroups));
-                      let currentGroup = initializeGroupPath(groupPath, newGroups);
-                      (currentGroup[groupIndex].rules as FilterRule[])[ruleIndex].value = val;
-                      return newGroups;
-                    });
-                  })}
-                </div>
-                <button
-                  type="button"
-                  className={styles.removeButton}
-                  onClick={() => handleRemoveRule(groupIndex, ruleIndex, groupPath)}
-                >
-                  Remove
-                </button>
-              </>
-            )}
+            <>
+              <select
+                value={rule.column}
+                onChange={(e) => {
+                  setFilterGroups(prevGroups => {
+                    const newGroups = JSON.parse(JSON.stringify(prevGroups));
+                    let currentGroup = initializeGroupPath(groupPath, newGroups);
+                    currentGroup[groupIndex].filterRules[ruleIndex].column = e.target.value;
+                    return newGroups;
+                  });
+                }}
+              >
+                <option value="">Select Column</option>
+                {columns.map((column) => (
+                  <option key={column.field} value={column.field}>
+                    {column.headerName}
+                  </option>
+                ))}
+              </select>
+              <select
+                value={rule.operator}
+                onChange={(e) => {
+                  setFilterGroups(prevGroups => {
+                    const newGroups = JSON.parse(JSON.stringify(prevGroups));
+                    let currentGroup = initializeGroupPath(groupPath, newGroups);
+                    currentGroup[groupIndex].filterRules[ruleIndex].operator = e.target.value;
+                    return newGroups;
+                  });
+                }}
+              >
+                {getOperators(rule.column).map((operator) => (
+                  <option key={operator} value={operator}>
+                    {operator}
+                  </option>
+                ))}
+              </select>
+              <div className={styles.filterInput}>
+                {renderFilterInput(rule.column, rule.value, (val) => {
+                  setFilterGroups(prevGroups => {
+                    const newGroups = JSON.parse(JSON.stringify(prevGroups));
+                    let currentGroup = initializeGroupPath(groupPath, newGroups);
+                    currentGroup[groupIndex].filterRules[ruleIndex].value = val;
+                    return newGroups;
+                  });
+                })}
+              </div>
+              <button
+                type="button"
+                className={styles.removeButton}
+                onClick={() => handleRemoveRule(groupIndex, ruleIndex, groupPath)}
+              >
+                Remove
+              </button>
+            </>
           </div>
         ))}
+        {group.filterGroups.length > 0 && (
+          <div className={styles.filterGroups}>
+            {renderFilterGroups(group.filterGroups, depth + 1, [...groupPath, groupIndex])}
+          </div>
+        )}
         <div className={styles.actions}>
           <button
             type="button"
@@ -206,7 +202,7 @@ const AdvancedFilter: React.FC<AdvancedFilterProps> = ({ columns, onApply, maxDe
       </div>
     ));
   };
-
+  
   return (
     <div className={styles.advancedFilter}>
       {renderFilterGroups(filterGroups, 1)}

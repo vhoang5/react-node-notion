@@ -16,7 +16,7 @@ const FilterDialog: React.FC<FilterDialogProps> = ({ open, columns, onClose, onA
     <Dialog open={open} onClose={onClose} fullWidth maxWidth="md">
       <DialogTitle>Advanced Filter</DialogTitle>
       <DialogContent className={styles.filterDialogContent}>
-        <AdvancedFilter columns={columns} onApply={onApply} maxDepth={4}/>
+        <AdvancedFilter columns={columns} maxDepth={3}/>
       </DialogContent>
       <DialogActions>
         <Button onClick={onClose}>Cancel</Button>

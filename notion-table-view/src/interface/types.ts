@@ -20,6 +20,7 @@ export interface Filter {
 }
 
 export interface FilterRule {
+  id?: string;
   column: string;
   operator: string;
   value: any;
@@ -27,5 +28,6 @@ export interface FilterRule {
 
 export interface FilterGroup {
   condition: string;
-  rules: (FilterRule | FilterGroup)[];
+  filterRules: FilterRule[];
+  filterGroups: FilterGroup[];
 }
